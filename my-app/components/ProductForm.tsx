@@ -16,7 +16,7 @@ export default function ProductForm({
 }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || '',
-    price: product?.price || 0,
+    price: product?.price ? Number(product.price) : 0,
     category: product?.category || '',
     isActive: product?.isActive ?? true,
   });
