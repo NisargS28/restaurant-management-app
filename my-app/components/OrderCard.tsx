@@ -41,7 +41,7 @@ export default function OrderCard({
               <p className="font-medium text-gray-900">{item.product.name}</p>
               {showPrices && (
                 <p className="text-sm text-gray-600">
-                  {formatCurrency(item.price)} × {item.quantity}
+                  {formatCurrency(Number(item.price))} × {item.quantity}
                 </p>
               )}
             </div>
@@ -59,7 +59,7 @@ export default function OrderCard({
         {showPrices && (
           <div>
             <p className="text-lg font-bold text-gray-900">
-              Total: {formatCurrency(order.totalAmount)}
+              Total: {formatCurrency(Number(order.totalAmount))}
             </p>
             {order.paymentMode && (
               <span

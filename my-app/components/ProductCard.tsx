@@ -49,7 +49,7 @@ export default function ProductCard({
           )}
 
           <p className="text-xl font-bold text-blue-600">
-            {formatCurrency(product.price)}
+            {formatCurrency(Number(product.price))}
           </p>
         </div>
 
