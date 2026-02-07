@@ -5,18 +5,29 @@ import Layout from '@/components/Layout';
 import ProductCard from '@/components/ProductCard';
 import Cart from '@/components/Cart';
 import ProductForm from '@/components/ProductForm';
+import Toast from '@/components/Toast';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { Product, CartItem, PaymentMode, ProductFormData } from '@/lib/types';
 import { api } from '@/lib/api';
 import { generateOrderNumber } from '@/lib/utils';
+
+type ToastType = { message: string; type: 'success' | 'error' | 'info' } | null;
 
 export default function CashierPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('CASH');
+  const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [activeTab, setActiveTab] = useState<'order' | 'manage'>('order');
+  const [toast, setToast] = useState<ToastType>(null);
+
+  // Show toast notification
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+  };
 
   // Fetch products on mount
   useEffect(() => {
@@ -24,10 +35,14 @@ export default function CashierPage() {
   }, []);
 
   const fetchProducts = async () => {
+    setIsLoading(true);
     const response = await api.getProducts();
     if (response.success && response.data) {
       setProducts(response.data);
+    } else {
+      showToast('Failed to load products', 'error');
     }
+    setIsLoading(false);
   };
 
   // Add product to cart
@@ -92,11 +107,11 @@ export default function CashierPage() {
     const response = await api.createOrder(orderData);
 
     if (response.success) {
-      alert(`Order placed successfully! Order #${response.data.orderNumber}`);
+      showToast(`Order placed successfully! Order #${response.data.orderNumber}`, 'success');
       setCart([]);
       setPaymentMode('CASH');
     } else {
-      alert(`Failed to place order: ${response.error}`);
+      showToast(`Failed to place order: ${response.error}`, 'error');
     }
 
     setIsProcessing(false);
@@ -107,8 +122,9 @@ export default function CashierPage() {
     const response = await api.toggleProductStatus(product.id, !product.isActive);
     if (response.success) {
       fetchProducts();
+      showToast(`Product ${!product.isActive ? 'enabled' : 'disabled'} successfully`, 'success');
     } else {
-      alert(`Failed to update product: ${response.error}`);
+      showToast(`Failed to update product: ${response.error}`, 'error');
     }
   };
 
@@ -123,9 +139,9 @@ export default function CashierPage() {
     if (response.success) {
       fetchProducts();
       setShowProductForm(false);
-      setEditingProduct(null);
+      showToast(`Product ${editingProduct ? 'updated' : 'created'} successfully`, 'success');
     } else {
-      alert(`Failed to save product: ${response.error}`);
+      showToast(`Failed to save product: ${response.error}`, 'error');
     }
 
     setIsProcessing(false);
@@ -141,7 +157,22 @@ export default function CashierPage() {
 
   return (
     <Layout role="CASHIER" title="Cashier Dashboard">
-      <div className="flex gap-6">
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <LoadingSpinner size="lg" />
+          <span className="ml-4 text-xl text-gray-600">Loading products...</span>
+        </div>
+      ) : (
+        <div className="flex gap-6">
         {/* Left Side - Products */}
         <div className="flex-1">
           {/* Tabs */}
@@ -259,7 +290,8 @@ export default function CashierPage() {
             />
           </div>
         )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 }

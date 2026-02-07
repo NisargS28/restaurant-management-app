@@ -3,14 +3,26 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import OrderCard from '@/components/OrderCard';
+import Toast from '@/components/Toast';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import EmptyState from '@/components/EmptyState';
 import { OrderWithItems, OrderStatus } from '@/lib/types';
 import { api } from '@/lib/api';
+
+type ToastType = { message: string; type: 'success' | 'error' | 'info' } | null;
 
 export default function KitchenPage() {
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState<ToastType>(null);
+
+  // Show toast notification
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, type });
+  };
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -21,7 +33,10 @@ export default function KitchenPage() {
         (order: OrderWithItems) => order.status !== 'COMPLETED'
       );
       setOrders(activeOrders);
+    } else {
+      showToast('Failed to load orders', 'error');
     }
+    setIsLoading(false);
   };
 
   // Initial fetch and auto-refresh
@@ -42,8 +57,9 @@ export default function KitchenPage() {
 
     if (response.success) {
       fetchOrders();
+      showToast(`Order updated to ${status}`, 'success');
     } else {
-      alert(`Failed to update order: ${response.error}`);
+      showToast(`Failed to update order: ${response.error}`, 'error');
     }
 
     setUpdatingOrderId(null);
@@ -54,6 +70,15 @@ export default function KitchenPage() {
 
   return (
     <Layout role="KITCHEN" title="Kitchen Display">
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div>
         {/* Header Controls */}
         <div className="flex justify-between items-center mb-6">
@@ -120,15 +145,21 @@ export default function KitchenPage() {
         </div>
 
         {/* Orders Grid */}
-        {filteredOrders.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-2xl text-gray-400">No orders to display</p>
-            <p className="text-gray-500 mt-2">
-              {filter === 'all'
-                ? 'New orders will appear here'
-                : `No orders in ${filter} status`}
-            </p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <LoadingSpinner size="lg" />
+            <span className="ml-4 text-xl text-gray-600">Loading orders...</span>
           </div>
+        ) : filteredOrders.length === 0 ? (
+          <EmptyState
+            icon="👨‍🍳"
+            title="No orders to display"
+            description={
+              filter === 'all'
+                ? 'New orders will appear here automatically'
+                : `No orders in ${filter} status`
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredOrders.map((order) => (

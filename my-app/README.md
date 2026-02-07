@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RestoPOS - Restaurant Point of Sale System
 
-## Getting Started
+A simple and powerful POS system built for small restaurants and cafes. Manage orders, products, kitchen operations, and view sales reports all in one place.
 
-First, run the development server:
+## ✨ Features
+
+### 👤 Cashier Role
+
+- **Product Management**: Add, edit, and disable products
+- **Order Processing**: Quick order placement with cart management
+- **Payment Modes**: Support for CASH, UPI, and CARD payments
+- **Sales Reports**: Daily sales, item-wise sales, and payment summaries
+- **Category Organization**: Products grouped by categories for easy navigation
+
+### 👨‍🍳 Kitchen Role
+
+- **Order Display**: View incoming orders without prices
+- **Status Management**: Update order status (PENDING → PREPARING → READY → COMPLETED)
+- **Auto-Refresh**: Orders refresh automatically every 5 seconds
+- **Filter Options**: Filter by order status for better workflow
+- **Real-time Updates**: See new orders as they come in
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 16 (App Router) + React 19
+- **Styling**: Tailwind CSS 4
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL (hosted on Supabase)
+- **ORM**: Prisma 5
+- **Language**: TypeScript 5
+
+## 🛠️ Installation
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Setup Environment Variables
+
+Create a `.env` file with your Supabase connection:
+
+```env
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@db.xxx.supabase.co:5432/postgres"
+NEXT_PUBLIC_SUPABASE_URL="https://xxx.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+```
+
+**Note**: URL-encode special characters in password (e.g., `@` → `%40`).
+
+### 3. Initialize Database
+
+```bash
+npm run prisma:generate  # Generate Prisma Client
+npm run prisma:push      # Create database tables
+npm run prisma:seed      # Add sample data
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎯 Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Select Role**: Choose CASHIER or KITCHEN from home page
+2. **As Cashier**: Place orders, manage products, view reports
+3. **As Kitchen**: View and update order status
 
-## Learn More
+See [TESTING.md](TESTING.md) for detailed testing guide.
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/              # Next.js pages and API routes
+components/       # React components
+lib/              # Utilities, types, and API client
+prisma/           # Database schema and seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Scripts
 
-## Deploy on Vercel
+```bash
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run prisma:generate  # Generate Prisma Client
+npm run prisma:push      # Push schema to database
+npm run prisma:seed      # Seed database
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📊 API Endpoints
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Products**: `/api/products` - CRUD operations
+- **Orders**: `/api/orders` - Order management
+- **Reports**: `/api/reports/*` - Sales analytics
+- **Users**: `/api/users` - User data
+
+## 🚀 Deployment
+
+Deploy to Vercel:
+
+1. Push to GitHub
+2. Import in Vercel
+3. Add environment variables
+4. Deploy
+
+---
+
+**Made with ❤️ for small restaurants and cafes**
