@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getTodayDate } from '@/lib/utils';
+import { DailySalesReport, OrderStatus, PaymentMode } from '@/lib/types';
 
 // GET /api/reports/daily-sales - Get daily sales report
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse<DailySalesReport | { error: string }>> {
   try {
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get('date');
-    const targetDate = dateParam || getTodayDate();
+    const targetDate: string = dateParam || getTodayDate();
 
     // Get start and end of day
     const startOfDay = new Date(targetDate);
@@ -27,39 +28,41 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate totals
-    const totalOrders = orders.length;
-    const totalRevenue = orders.reduce(
-      (sum, order) => sum + parseFloat(order.totalAmount.toString()),
+    const totalOrders: number = orders.length;
+    const totalRevenue: number = orders.reduce(
+      (sum: number, order: any) => sum + parseFloat(order.totalAmount.toString()),
       0
     );
 
     // Group by status
-    const ordersByStatus = orders.reduce(
-      (acc, order) => {
+    const ordersByStatus: Record<OrderStatus, number> = orders.reduce(
+      (acc: any, order: any) => {
         acc[order.status] = (acc[order.status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<OrderStatus, number>
     );
 
     // Group by payment mode
-    const ordersByPaymentMode = orders.reduce(
-      (acc, order) => {
+    const ordersByPaymentMode: Record<PaymentMode, number> = orders.reduce(
+      (acc: any, order: any) => {
         if (order.paymentMode) {
           acc[order.paymentMode] = (acc[order.paymentMode] || 0) + 1;
         }
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<PaymentMode, number>
     );
 
-    return NextResponse.json({
+    const report: DailySalesReport = {
       date: targetDate,
       totalOrders,
       totalRevenue,
       ordersByStatus,
       ordersByPaymentMode,
-    });
+    };
+
+    return NextResponse.json(report);
   } catch (error) {
     console.error('Daily sales report error:', error);
     return NextResponse.json(

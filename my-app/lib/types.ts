@@ -11,7 +11,7 @@ export interface CartItem {
 }
 
 export interface OrderWithItems extends Order {
-  orderItems: (OrderItem & {
+  items: (OrderItem & {
     product: Product;
   })[];
 }

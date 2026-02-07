@@ -1,4 +1,4 @@
-import { OrderWithItems } from '@/lib/types';
+import { OrderWithItems, OrderStatus } from '@/lib/types';
 import { formatCurrency, formatDateTime, getPaymentModeColor } from '@/lib/utils';
 import StatusBadge from './StatusBadge';
 
@@ -19,20 +19,23 @@ export default function OrderCard({
   const currentIndex = statusFlow.indexOf(order.status);
   const nextStatus = currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
 
+  // Calculate total amount from items
+  const totalAmount = order.items.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border-2 border-gray-200">
       {/* Order Header */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold text-gray-900">{order.orderNumber}</h3>
+          <h3 className="text-xl font-bold text-gray-900">Order #{order.id}</h3>
           <p className="text-sm text-gray-600">{formatDateTime(order.createdAt)}</p>
         </div>
-        <StatusBadge status={order.status} large />
+        <StatusBadge status={order.status as OrderStatus} large />
       </div>
 
       {/* Order Items */}
       <div className="mb-4 space-y-2">
-        {order.orderItems.map((item) => (
+        {order.items.map((item) => (
           <div
             key={item.id}
             className="flex justify-between items-center p-2 bg-gray-50 rounded"
@@ -59,7 +62,7 @@ export default function OrderCard({
         {showPrices && (
           <div>
             <p className="text-lg font-bold text-gray-900">
-              Total: {formatCurrency(Number(order.totalAmount))}
+              Total: {formatCurrency(totalAmount)}
             </p>
             {order.paymentMode && (
               <span
