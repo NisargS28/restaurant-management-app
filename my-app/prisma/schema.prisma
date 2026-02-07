@@ -1,0 +1,71 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+  role Role
+
+  @@map("users")
+}
+
+model Product {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(150)
+  price     Decimal     @db.Decimal(10, 2)
+  category  String?     @db.VarChar(100)
+  isActive  Boolean     @default(true) @map("is_active")
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  orderNumber String      @unique @map("order_number") @db.VarChar(50)
+  totalAmount Decimal     @map("total_amount") @db.Decimal(10, 2)
+  paymentMode PaymentMode? @map("payment_mode")
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  orderItems  OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+enum Role {
+  CASHIER
+  KITCHEN
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  CARD
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  COMPLETED
+}
