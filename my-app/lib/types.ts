@@ -1,7 +1,6 @@
 // Re-export Prisma generated types
-import type { User, Product, Order, OrderItem } from '@prisma/client';
-export type { User, Product, Order, OrderItem };
-export { Role, PaymentMode, OrderStatus } from '@prisma/client';
+import type { User, Product, Order, OrderItem, Role, PaymentMode, OrderStatus } from '@prisma/client';
+export type { User, Product, Order, OrderItem, Role, PaymentMode, OrderStatus };
 
 // Extended types for API responses
 export interface CartItem {
