@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Aggregate by product
     const itemSalesMap = new Map<number, any>();
 
-    orderItems.forEach((item: any) => {
+    orderItems.forEach((item) => {
       const existing = itemSalesMap.get(item.productId);
       const revenue = parseFloat(item.price.toString()) * item.quantity;
 

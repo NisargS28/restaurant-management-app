@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Aggregate by payment mode
     const paymentSummaryMap = new Map<string, any>();
 
-    orders.forEach((order: any) => {
+    orders.forEach((order) => {
       if (!order.paymentMode) return;
 
       const existing = paymentSummaryMap.get(order.paymentMode);
