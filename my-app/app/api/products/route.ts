@@ -14,10 +14,13 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(products);
-  } catch (error) {
-    console.error('Products GET error:', error);
+  } catch (error: any) {
+    console.error('Products GET error:', error?.message || error);
+    if (error?.stack) {
+      console.error('Stack trace:', error.stack);
+    }
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
+      { error: 'Failed to fetch products', details: error?.message || String(error) },
       { status: 500 }
     );
   }
@@ -53,10 +56,13 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(product, { status: 201 });
-  } catch (error) {
-    console.error('Products POST error:', error);
+  } catch (error: any) {
+    console.error('Products POST error:', error?.message || error);
+    if (error?.stack) {
+      console.error('Stack trace:', error.stack);
+    }
     return NextResponse.json(
-      { error: 'Failed to create product' },
+      { error: 'Failed to create product', details: error?.message || String(error) },
       { status: 500 }
     );
   }
