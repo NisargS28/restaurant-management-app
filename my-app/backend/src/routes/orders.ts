@@ -90,7 +90,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const order = await prisma.order.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       include: {
         orderItems: {
           include: {
@@ -129,7 +129,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
     }
 
     const order = await prisma.order.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: parseInt(req.params.id as string) },
       data: { status: body.status },
       include: {
         orderItems: {
