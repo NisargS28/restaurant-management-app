@@ -67,6 +67,25 @@ async function main() {
 
   console.log(`✅ Created ${products.length} products`);
 
+  // Create sample tables
+  const tables = [
+    { tableNo: 'T1', qrToken: 'table-t1-' + Date.now().toString(36) },
+    { tableNo: 'T2', qrToken: 'table-t2-' + Date.now().toString(36) },
+    { tableNo: 'T3', qrToken: 'table-t3-' + Date.now().toString(36) },
+    { tableNo: 'T4', qrToken: 'table-t4-' + Date.now().toString(36) },
+    { tableNo: 'T5', qrToken: 'table-t5-' + Date.now().toString(36) },
+  ];
+
+  for (const table of tables) {
+    await prisma.table.upsert({
+      where: { tableNo: table.tableNo },
+      update: {},
+      create: table,
+    });
+  }
+
+  console.log(`✅ Created ${tables.length} tables`);
+
   // Create a sample order
   const order = await prisma.order.create({
     data: {

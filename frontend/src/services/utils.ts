@@ -57,6 +57,8 @@ export function getStatusColor(status: string): string {
   switch (status) {
     case 'PENDING':
       return 'bg-yellow-100 text-yellow-800';
+    case 'APPROVED':
+      return 'bg-orange-100 text-orange-800';
     case 'PREPARING':
       return 'bg-blue-100 text-blue-800';
     case 'READY':

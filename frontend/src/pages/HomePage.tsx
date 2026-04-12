@@ -13,7 +13,7 @@ export default function HomePage() {
             Select your role to continue
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {/* Cashier Card */}
             <Link
               to="/cashier"
@@ -29,8 +29,8 @@ export default function HomePage() {
               <ul className="mt-4 text-sm text-gray-500 text-left space-y-1">
                 <li>✓ Product management</li>
                 <li>✓ Place orders & billing</li>
-                <li>✓ Sales reports</li>
-                <li>✓ Payment processing</li>
+                <li>✓ Approve QR orders</li>
+                <li>✓ Settle tables</li>
               </ul>
             </Link>
 
@@ -47,10 +47,30 @@ export default function HomePage() {
                 View incoming orders and update status
               </p>
               <ul className="mt-4 text-sm text-gray-500 text-left space-y-1">
-                <li>✓ View incoming orders</li>
+                <li>✓ View approved orders</li>
                 <li>✓ Update order status</li>
                 <li>✓ Track preparation</li>
                 <li>✓ Mark orders ready</li>
+              </ul>
+            </Link>
+
+            {/* Table Management Card */}
+            <Link
+              to="/tables"
+              className="group bg-white rounded-2xl shadow-lg border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all p-8"
+            >
+              <div className="text-6xl mb-4">🪑</div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-purple-600">
+                TABLES
+              </h2>
+              <p className="text-gray-600">
+                Manage tables and generate QR codes
+              </p>
+              <ul className="mt-4 text-sm text-gray-500 text-left space-y-1">
+                <li>✓ Create & manage tables</li>
+                <li>✓ Generate QR codes</li>
+                <li>✓ View active sessions</li>
+                <li>✓ Settle & reset tables</li>
               </ul>
             </Link>
           </div>

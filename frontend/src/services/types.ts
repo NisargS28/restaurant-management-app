@@ -4,7 +4,9 @@ export type Role = 'CASHIER' | 'KITCHEN';
 
 export type PaymentMode = 'CASH' | 'UPI' | 'CARD';
 
-export type OrderStatus = 'PENDING' | 'PREPARING' | 'READY' | 'COMPLETED';
+export type OrderStatus = 'PENDING' | 'APPROVED' | 'PREPARING' | 'READY' | 'COMPLETED';
+
+export type OrderSource = 'CASHIER' | 'QR';
 
 export interface User {
   id: number;
@@ -20,6 +22,21 @@ export interface Product {
   isActive: boolean;
 }
 
+export interface Table {
+  id: number;
+  tableNo: string;
+  qrToken: string;
+  isActive: boolean;
+  lastSettledAt: string;
+}
+
+export interface TableWithSession extends Table {
+  activeSession: {
+    orderCount: number;
+    totalAmount: number;
+  };
+}
+
 export interface Order {
   id: number;
   orderNumber: string;
@@ -27,6 +44,9 @@ export interface Order {
   createdAt: string;
   paymentMode: PaymentMode | null;
   status: OrderStatus;
+  source: OrderSource;
+  tableId: number | null;
+  table: Table | null;
 }
 
 export interface OrderItem {
@@ -64,6 +84,11 @@ export interface CreateOrderRequest {
   paymentMode: PaymentMode;
 }
 
+export interface CustomerOrderRequest {
+  tableToken: string;
+  items: OrderItemCreate[];
+}
+
 export interface UpdateOrderStatusRequest {
   status: OrderStatus;
 }
@@ -73,6 +98,13 @@ export interface ProductFormData {
   price: number;
   category: string;
   isActive?: boolean;
+}
+
+export interface TableSession {
+  table: Table;
+  orders: OrderWithItems[];
+  totalAmount: number;
+  orderCount: number;
 }
 
 // Report types
@@ -104,3 +136,4 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
 }
+

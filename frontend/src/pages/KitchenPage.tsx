@@ -26,11 +26,14 @@ export default function KitchenPage() {
   const fetchOrders = async () => {
     const response = await api.getOrders();
     if (response.success && response.data) {
-      // Filter out completed orders, show only active ones
-      const activeOrders = response.data.filter(
-        (order: OrderWithItems) => order.status !== 'COMPLETED'
+      // Kitchen only sees APPROVED, PREPARING, READY — NOT PENDING or COMPLETED
+      const kitchenOrders = response.data.filter(
+        (order: OrderWithItems) =>
+          order.status === 'APPROVED' ||
+          order.status === 'PREPARING' ||
+          order.status === 'READY'
       );
-      setOrders(activeOrders);
+      setOrders(kitchenOrders);
     } else {
       showToast('Failed to load orders', 'error');
     }
@@ -92,14 +95,14 @@ export default function KitchenPage() {
               All ({orders.length})
             </button>
             <button
-              onClick={() => setFilter('PENDING')}
+              onClick={() => setFilter('APPROVED')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === 'PENDING'
-                  ? 'bg-yellow-600 text-white'
+                filter === 'APPROVED'
+                  ? 'bg-orange-600 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
-              Pending ({orders.filter((o) => o.status === 'PENDING').length})
+              Approved ({orders.filter((o) => o.status === 'APPROVED').length})
             </button>
             <button
               onClick={() => setFilter('PREPARING')}
@@ -154,7 +157,7 @@ export default function KitchenPage() {
             title="No orders to display"
             description={
               filter === 'all'
-                ? 'New orders will appear here automatically'
+                ? 'Approved orders will appear here automatically'
                 : `No orders in ${filter} status`
             }
           />

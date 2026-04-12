@@ -23,6 +23,7 @@ router.get('/', async (req: Request, res: Response) => {
             product: true,
           },
         },
+        table: true,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -31,6 +32,32 @@ router.get('/', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Orders GET error:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// GET /api/orders/pending-approval - Get all pending QR orders
+router.get('/pending-approval', async (_req: Request, res: Response) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        status: 'PENDING',
+        source: 'QR',
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        table: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Pending approval GET error:', error);
+    res.status(500).json({ error: 'Failed to fetch pending orders' });
   }
 });
 
@@ -62,6 +89,7 @@ router.post('/', async (req: Request, res: Response) => {
         totalAmount: body.totalAmount,
         paymentMode: body.paymentMode,
         status: 'PENDING',
+        source: 'CASHIER',
         orderItems: {
           create: body.items.map((item: any) => ({
             productId: item.productId,
@@ -76,6 +104,7 @@ router.post('/', async (req: Request, res: Response) => {
             product: true,
           },
         },
+        table: true,
       },
     });
 
@@ -83,6 +112,79 @@ router.post('/', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Orders POST error:', error);
     res.status(500).json({ error: 'Failed to create order' });
+  }
+});
+
+// POST /api/orders/customer - Create a customer order via QR
+router.post('/customer', async (req: Request, res: Response) => {
+  try {
+    const { tableToken, items } = req.body;
+
+    if (!tableToken || typeof tableToken !== 'string') {
+      res.status(400).json({ error: 'Table token is required' });
+      return;
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      res.status(400).json({ error: 'Order must have at least one item' });
+      return;
+    }
+
+    // Find the table by QR token
+    const table = await prisma.table.findUnique({
+      where: { qrToken: tableToken },
+    });
+
+    if (!table) {
+      res.status(404).json({ error: 'Invalid table QR code' });
+      return;
+    }
+
+    if (!table.isActive) {
+      res.status(403).json({ error: 'This table is currently inactive' });
+      return;
+    }
+
+    // Calculate total amount
+    const totalAmount = items.reduce(
+      (sum: number, item: any) => sum + (item.price * item.quantity),
+      0
+    );
+
+    if (totalAmount <= 0) {
+      res.status(400).json({ error: 'Total amount must be greater than 0' });
+      return;
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        orderNumber: generateOrderNumber(),
+        totalAmount,
+        status: 'PENDING',
+        source: 'QR',
+        tableId: table.id,
+        orderItems: {
+          create: items.map((item: any) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        table: true,
+      },
+    });
+
+    res.status(201).json(order);
+  } catch (error) {
+    console.error('Customer order POST error:', error);
+    res.status(500).json({ error: 'Failed to create customer order' });
   }
 });
 
@@ -97,6 +199,7 @@ router.get('/:id', async (req: Request, res: Response) => {
             product: true,
           },
         },
+        table: true,
       },
     });
 
@@ -112,6 +215,46 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
+// PATCH /api/orders/:id/approve - Approve a pending customer order
+router.patch('/:id/approve', async (req: Request, res: Response) => {
+  try {
+    const orderId = parseInt(req.params.id as string);
+
+    // Verify the order exists and is PENDING
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!existingOrder) {
+      res.status(404).json({ error: 'Order not found' });
+      return;
+    }
+
+    if (existingOrder.status !== 'PENDING') {
+      res.status(400).json({ error: 'Only PENDING orders can be approved' });
+      return;
+    }
+
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'APPROVED' },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
+          },
+        },
+        table: true,
+      },
+    });
+
+    res.json(order);
+  } catch (error) {
+    console.error('Order approve error:', error);
+    res.status(500).json({ error: 'Failed to approve order' });
+  }
+});
+
 // PATCH /api/orders/:id - Update order status
 router.patch('/:id', async (req: Request, res: Response) => {
   try {
@@ -122,7 +265,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
       return;
     }
 
-    const validStatuses = ['PENDING', 'PREPARING', 'READY', 'COMPLETED'];
+    const validStatuses = ['PENDING', 'APPROVED', 'PREPARING', 'READY', 'COMPLETED'];
     if (!validStatuses.includes(body.status)) {
       res.status(400).json({ error: 'Invalid status value' });
       return;
@@ -137,6 +280,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
             product: true,
           },
         },
+        table: true,
       },
     });
 

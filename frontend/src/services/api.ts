@@ -39,6 +39,7 @@ export async function apiRequest<T>(
 export const api = {
   // Products
   getProducts: () => apiRequest<any>('/api/products'),
+  getActiveProducts: () => apiRequest<any>('/api/products?active=true'),
   getProduct: (id: number) => apiRequest<any>(`/api/products/${id}`),
   createProduct: (data: any) =>
     apiRequest<any>('/api/products', {
@@ -72,6 +73,40 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
+  // QR Order endpoints
+  createCustomerOrder: (data: { tableToken: string; items: any[] }) =>
+    apiRequest<any>('/api/orders/customer', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  approveOrder: (id: number) =>
+    apiRequest<any>(`/api/orders/${id}/approve`, {
+      method: 'PATCH',
+    }),
+  getPendingApproval: () => apiRequest<any>('/api/orders/pending-approval'),
+
+  // Tables
+  getTables: () => apiRequest<any>('/api/tables'),
+  createTable: (tableNo: string) =>
+    apiRequest<any>('/api/tables', {
+      method: 'POST',
+      body: JSON.stringify({ tableNo }),
+    }),
+  getTableByToken: (token: string) => apiRequest<any>(`/api/tables/${token}`),
+  getTableSession: (token: string) => apiRequest<any>(`/api/tables/${token}/session`),
+  toggleTableStatus: (id: number, isActive: boolean) =>
+    apiRequest<any>(`/api/tables/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
+    }),
+  settleTable: (id: number) =>
+    apiRequest<any>(`/api/tables/${id}/settle`, {
+      method: 'PATCH',
+    }),
+  deleteTable: (id: number) =>
+    apiRequest<any>(`/api/tables/${id}`, {
+      method: 'DELETE',
+    }),
 
   // Reports
   getDailySales: (date?: string) => {
@@ -96,3 +131,4 @@ export const api = {
   // Users
   getUsers: () => apiRequest<any>('/api/users'),
 };
+

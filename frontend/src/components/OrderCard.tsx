@@ -6,6 +6,7 @@ interface OrderCardProps {
   order: OrderWithItems;
   showPrices?: boolean;
   onUpdateStatus?: (orderId: number, status: string) => void;
+  onApprove?: (orderId: number) => void;
   isUpdating?: boolean;
 }
 
@@ -13,9 +14,10 @@ export default function OrderCard({
   order,
   showPrices = true,
   onUpdateStatus,
+  onApprove,
   isUpdating = false,
 }: OrderCardProps) {
-  const statusFlow = ['PENDING', 'PREPARING', 'READY', 'COMPLETED'];
+  const statusFlow = ['PENDING', 'APPROVED', 'PREPARING', 'READY', 'COMPLETED'];
   const currentIndex = statusFlow.indexOf(order.status);
   const nextStatus = currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
 
@@ -26,8 +28,28 @@ export default function OrderCard({
         <div>
           <h3 className="text-xl font-bold text-gray-900">{order.orderNumber}</h3>
           <p className="text-sm text-gray-600">{formatDateTime(order.createdAt)}</p>
+          {/* Table info */}
+          {order.table && (
+            <p className="text-sm font-semibold text-blue-600 mt-1">
+              📍 Table {order.table.tableNo}
+            </p>
+          )}
         </div>
-        <StatusBadge status={order.status} large />
+        <div className="flex flex-col items-end gap-2">
+          <StatusBadge status={order.status} large />
+          {/* Source badge */}
+          <span
+            className={`
+              inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
+              ${order.source === 'QR'
+                ? 'bg-purple-100 text-purple-800'
+                : 'bg-gray-100 text-gray-700'
+              }
+            `}
+          >
+            {order.source === 'QR' ? '📱 QR Order' : '💰 Cashier'}
+          </span>
+        </div>
       </div>
 
       {/* Order Items */}
@@ -73,15 +95,29 @@ export default function OrderCard({
           </div>
         )}
 
-        {onUpdateStatus && nextStatus && (
-          <button
-            onClick={() => onUpdateStatus(order.id, nextStatus)}
-            disabled={isUpdating}
-            className="px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {isUpdating ? 'Updating...' : `Mark as ${nextStatus}`}
-          </button>
-        )}
+        <div className="flex gap-2">
+          {/* Approve button for pending QR orders */}
+          {onApprove && order.status === 'PENDING' && (
+            <button
+              onClick={() => onApprove(order.id)}
+              disabled={isUpdating}
+              className="px-6 py-3 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {isUpdating ? 'Approving...' : '✓ Approve'}
+            </button>
+          )}
+
+          {/* Next status button for kitchen flow */}
+          {onUpdateStatus && nextStatus && order.status !== 'PENDING' && (
+            <button
+              onClick={() => onUpdateStatus(order.id, nextStatus)}
+              disabled={isUpdating}
+              className="px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {isUpdating ? 'Updating...' : `Mark as ${nextStatus}`}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
