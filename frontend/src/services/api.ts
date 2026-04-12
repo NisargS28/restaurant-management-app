@@ -1,12 +1,15 @@
 import { ApiResponse } from './types';
 
 // Base API fetch wrapper
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 export async function apiRequest<T>(
   url: string,
   options?: RequestInit
 ): Promise<ApiResponse<T>> {
   try {
-    const response = await fetch(url, {
+    const fullUrl = `${API_BASE_URL}${url}`;
+    const response = await fetch(fullUrl, {
       headers: {
         'Content-Type': 'application/json',
         ...options?.headers,
