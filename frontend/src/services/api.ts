@@ -1,7 +1,7 @@
 import { ApiResponse } from './types';
 
 // Base API fetch wrapper
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://restaurant-management-app-6blw.onrender.com';
 
 export async function apiRequest<T>(
   url: string,
