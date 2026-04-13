@@ -18,7 +18,12 @@ export default function OrderCard({
   isUpdating = false,
 }: OrderCardProps) {
   const statusFlow = ['PENDING', 'APPROVED', 'PREPARING', 'READY', 'COMPLETED'];
-  const currentIndex = statusFlow.indexOf(order.status);
+  
+  // Handle old backend stuck orders: PENDING cashier orders should go straight to PREPARING
+  const isPendingCashier = order.status === 'PENDING' && order.source === 'CASHIER';
+  const effectiveStatus = isPendingCashier ? 'APPROVED' : order.status;
+  
+  const currentIndex = statusFlow.indexOf(effectiveStatus);
   const nextStatus = currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
 
   return (
@@ -108,7 +113,7 @@ export default function OrderCard({
           )}
 
           {/* Next status button for kitchen flow */}
-          {onUpdateStatus && nextStatus && order.status !== 'PENDING' && (
+          {onUpdateStatus && nextStatus && (order.status !== 'PENDING' || isPendingCashier) && (
             <button
               onClick={() => onUpdateStatus(order.id, nextStatus)}
               disabled={isUpdating}

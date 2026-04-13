@@ -32,10 +32,18 @@ export default function KitchenPage() {
     isFetchingRef.current = true;
 
     try {
-      // Uses ?kitchen=true — backend returns only APPROVED, PREPARING, READY
+      // Uses ?kitchen=true — backend returns only APPROVED, PREPARING, READY (if backend is updated)
       const response = await api.getKitchenOrders();
       if (response.success && response.data) {
-        setOrders(response.data);
+        // Fallback filter in case production backend is not updated yet and ignores ?kitchen=true
+        const kitchenOrders = response.data.filter(
+          (order: OrderWithItems) =>
+            order.status === 'APPROVED' ||
+            order.status === 'PREPARING' ||
+            order.status === 'READY' ||
+            (order.status === 'PENDING' && order.source === 'CASHIER') // Handle legacy/un-updated backend stuck orders
+        );
+        setOrders(kitchenOrders);
         setFetchError(null);
         setLastUpdated(new Date());
       } else {
