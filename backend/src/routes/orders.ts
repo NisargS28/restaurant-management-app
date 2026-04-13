@@ -11,12 +11,20 @@ function generateOrderNumber(): string {
 }
 
 // GET /api/orders - Get all orders or filter by status
+// Special query: ?kitchen=true returns only APPROVED, PREPARING, READY orders
 router.get('/', async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string | undefined;
+    const kitchenView = req.query.kitchen === 'true';
+
+    const whereClause = kitchenView
+      ? { status: { in: ['APPROVED', 'PREPARING', 'READY'] as any[] } }
+      : status
+      ? { status: status as any }
+      : undefined;
 
     const orders = await prisma.order.findMany({
-      where: status ? { status: status as any } : undefined,
+      where: whereClause,
       include: {
         orderItems: {
           include: {
@@ -61,7 +69,7 @@ router.get('/pending-approval', async (_req: Request, res: Response) => {
   }
 });
 
-// POST /api/orders - Create a new order
+// POST /api/orders - Create a new order (CASHIER source)
 router.post('/', async (req: Request, res: Response) => {
   try {
     const body = req.body;
@@ -82,13 +90,13 @@ router.post('/', async (req: Request, res: Response) => {
       return;
     }
 
-    // Create order with items in a transaction
+    // Create order — CASHIER orders go directly to APPROVED so kitchen sees them immediately
     const order = await prisma.order.create({
       data: {
         orderNumber: generateOrderNumber(),
         totalAmount: body.totalAmount,
         paymentMode: body.paymentMode,
-        status: 'PENDING',
+        status: 'APPROVED',
         source: 'CASHIER',
         orderItems: {
           create: body.items.map((item: any) => ({
@@ -115,7 +123,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/orders/customer - Create a customer order via QR
+// POST /api/orders/customer - Create a customer order via QR (must be defined before /:id routes)
 router.post('/customer', async (req: Request, res: Response) => {
   try {
     const { tableToken, items } = req.body;

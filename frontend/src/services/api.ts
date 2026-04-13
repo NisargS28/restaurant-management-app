@@ -65,6 +65,8 @@ export const api = {
     const query = status ? `?status=${status}` : '';
     return apiRequest<any>(`/api/orders${query}`);
   },
+  // Kitchen-specific fetch — only APPROVED, PREPARING, READY orders
+  getKitchenOrders: () => apiRequest<any>('/api/orders?kitchen=true'),
   getOrder: (id: number) => apiRequest<any>(`/api/orders/${id}`),
   createOrder: (data: any) =>
     apiRequest<any>('/api/orders', {
