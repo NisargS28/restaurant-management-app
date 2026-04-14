@@ -250,45 +250,45 @@ export default function CashierPage() {
         {/* Left Side - Products */}
         <div className="flex-1">
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 flex-wrap">
+          <div className="flex gap-2 mb-6 p-1 bg-white border border-gray-200 rounded-xl w-fit shadow-sm">
             <button
               onClick={() => setActiveTab('order')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${
                 activeTab === 'order'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-blue-50 text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               Place Order
             </button>
             <button
               onClick={() => setActiveTab('pending')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors relative ${
+              className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 relative flex items-center gap-2 ${
                 activeTab === 'pending'
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-orange-50 text-orange-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               Customer Orders
               {pendingOrders.length > 0 && (
-                <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="w-5 h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
                   {pendingOrders.length}
                 </span>
               )}
             </button>
             <button
               onClick={() => setActiveTab('manage')}
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 ${
                 activeTab === 'manage'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-gray-900 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               Manage Products
             </button>
             <Link
               to="/reports"
-              className="px-6 py-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+              className="px-5 py-2.5 rounded-lg font-bold text-sm transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
             >
               View Reports
             </Link>
@@ -299,8 +299,11 @@ export default function CashierPage() {
             <div className="space-y-6">
               {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
                 <div key={category}>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{category}</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <h2 className="text-xl font-black text-gray-900 uppercase tracking-widest">{category}</h2>
+                    <div className="h-px flex-1 bg-gray-200"></div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {(categoryProducts as Product[]).map((product) => (
                       <ProductCard
                         key={product.id}
@@ -355,31 +358,31 @@ export default function CashierPage() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     🪑 Active Table Sessions
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {tables.map((table) => (
                       <div
                         key={table.id}
-                        className="bg-white rounded-lg shadow-md p-5 border-2 border-blue-200"
+                        className="bg-white rounded-xl shadow-sm border border-gray-200 relative overflow-hidden group hover:shadow-md transition-shadow p-5"
                       >
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h3 className="text-xl font-bold text-gray-900">
+                            <h3 className="text-xl font-black text-gray-900 tracking-tight">
                               Table {table.tableNo}
                             </h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
                               {table.activeSession.orderCount} order{table.activeSession.orderCount !== 1 ? 's' : ''}
                             </p>
                           </div>
-                          <span className="text-xl font-bold text-blue-600">
+                          <span className="text-2xl font-black text-blue-600">
                             {formatCurrency(table.activeSession.totalAmount)}
                           </span>
                         </div>
                         <button
                           onClick={() => handleSettleTable(table.id, table.tableNo)}
                           disabled={settlingTableId === table.id}
-                          className="w-full mt-2 px-4 py-3 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                          className="w-full mt-3 px-4 py-3 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                         >
-                          {settlingTableId === table.id ? 'Settling...' : '💳 Settle & Reset Table'}
+                          {settlingTableId === table.id ? 'Settling...' : '💳 Settle & Reset'}
                         </button>
                       </div>
                     ))}
@@ -442,7 +445,7 @@ export default function CashierPage() {
 
         {/* Right Side - Cart (only show on order tab) */}
         {activeTab === 'order' && (
-          <div className="w-96">
+          <div className="w-[400px] shrink-0 xl:w-[450px]">
             <Cart
               items={cart}
               paymentMode={paymentMode}

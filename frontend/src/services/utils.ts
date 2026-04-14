@@ -109,3 +109,31 @@ export function validateProductData(data: {
     errors,
   };
 }
+
+// Generate fallback aesthetic images for products
+export function getProductImage(category: string | null, name: string): string {
+  const c = (category || '').toLowerCase();
+  const n = (name || '').toLowerCase();
+  
+  // Specific Indian/Menu item mappings
+  if (n.includes('dosa')) return 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('idli')) return 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('uttapam') || n.includes('uttappam')) return 'https://images.unsplash.com/photo-1627308595229-7830f5c9c66e?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('cold coffee')) return 'https://images.unsplash.com/photo-1461023058943-0708e52150fe?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('coffee') || c.includes('coffee') || c.includes('tea')) return 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('sandwich')) return 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80';
+  
+  // Generic category mappings
+  if (n.includes('burger') || c.includes('burger')) return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('pizza') || c.includes('pizza')) return 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('drink') || n.includes('beverage') || c.includes('drink') || c.includes('beverage') || n.includes('juice')) return 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('dessert') || n.includes('cake') || n.includes('sweet') || c.includes('dessert')) return 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('pasta') || c.includes('pasta') || n.includes('spaghetti')) return 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800&q=80';
+  if (n.includes('salad') || c.includes('salad')) return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80';
+  if (c.includes('starter') || c.includes('appetizer')) return 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=800&q=80';
+  if (c.includes('main') || c.includes('course')) return 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80';
+  
+  // Default fallback image
+  return 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80';
+}
+

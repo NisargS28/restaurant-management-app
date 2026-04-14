@@ -1,5 +1,5 @@
 import { OrderWithItems } from '../services/types';
-import { formatCurrency, formatDateTime, getPaymentModeColor } from '../services/utils';
+import { formatCurrency, formatDateTime, getPaymentModeColor, getProductImage } from '../services/utils';
 import StatusBadge from './StatusBadge';
 
 interface OrderCardProps {
@@ -27,28 +27,31 @@ export default function OrderCard({
   const nextStatus = currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border-2 border-gray-200">
+    <div className="glass rounded-2xl shadow-lg p-6 border border-white/50 hover:shadow-xl transition-shadow duration-300 relative overflow-hidden group">
+      {/* Subtle indicator bar on the left */}
+      <div className={`absolute top-0 left-0 w-1.5 h-full ${order.status === 'PENDING' ? 'bg-yellow-400' : order.status === 'PREPARING' ? 'bg-blue-500' : order.status === 'READY' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+
       {/* Order Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-6">
         <div>
-          <h3 className="text-xl font-bold text-gray-900">{order.orderNumber}</h3>
-          <p className="text-sm text-gray-600">{formatDateTime(order.createdAt)}</p>
+          <h3 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-700 font-mono tracking-tight">{order.orderNumber}</h3>
+          <p className="text-xs text-gray-500 font-medium tracking-wide mt-1 uppercase">{formatDateTime(order.createdAt)}</p>
           {/* Table info */}
           {order.table && (
-            <p className="text-sm font-semibold text-blue-600 mt-1">
-              📍 Table {order.table.tableNo}
-            </p>
+            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-bold shadow-sm">
+              <span className="text-base">📍</span> Table {order.table.tableNo}
+            </div>
           )}
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-3 z-10">
           <StatusBadge status={order.status} large />
           {/* Source badge */}
           <span
             className={`
-              inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
+              inline-flex items-center px-2.5 py-1 text-[10px] font-black tracking-widest uppercase rounded-full shadow-sm
               ${order.source === 'QR'
-                ? 'bg-purple-100 text-purple-800'
-                : 'bg-gray-100 text-gray-700'
+                ? 'bg-purple-500/10 text-purple-700 border border-purple-200'
+                : 'bg-gray-100 text-gray-700 border border-gray-200'
               }
             `}
           >
@@ -58,39 +61,46 @@ export default function OrderCard({
       </div>
 
       {/* Order Items */}
-      <div className="mb-4 space-y-2">
-        {order.orderItems.map((item) => (
-          <div
-            key={item.id}
-            className="flex justify-between items-center p-2 bg-gray-50 rounded"
-          >
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">{item.product.name}</p>
-              {showPrices && (
-                <p className="text-sm text-gray-600">
-                  {formatCurrency(Number(item.price))} × {item.quantity}
-                </p>
+      <div className="mb-6 space-y-3">
+        {order.orderItems.map((item) => {
+          const imgUrl = getProductImage(item.product.category, item.product.name);
+          return (
+            <div
+              key={item.id}
+              className="flex items-center p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-gray-100/50 shadow-sm transition-transform hover:-translate-x-1"
+            >
+              <img src={imgUrl} alt={item.product.name} className="w-12 h-12 rounded-lg object-cover shadow-sm mr-4" />
+              
+              <div className="flex-1">
+                <p className="font-bold text-gray-900">{item.product.name}</p>
+                {showPrices && (
+                  <p className="text-xs font-semibold text-gray-500 mt-0.5">
+                    {formatCurrency(Number(item.price))} <span className="text-gray-400 mx-1">×</span> <span className="text-gray-800">{item.quantity}</span>
+                  </p>
+                )}
+              </div>
+              
+              {!showPrices && (
+                <div className="bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded-lg font-bold shadow-md">
+                  {item.quantity}
+                </div>
               )}
             </div>
-            {!showPrices && (
-              <p className="text-lg font-semibold text-gray-900">
-                Qty: {item.quantity}
-              </p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Order Footer */}
-      <div className="flex justify-between items-center pt-4 border-t">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-5 border-t border-gray-200/60">
         {showPrices && (
-          <div>
-            <p className="text-lg font-bold text-gray-900">
-              Total: {formatCurrency(Number(order.totalAmount))}
+          <div className="w-full sm:w-auto">
+            <p className="text-sm font-medium text-gray-500 mb-1">Total Amount</p>
+            <p className="text-2xl font-black text-gray-900 tracking-tight">
+              {formatCurrency(Number(order.totalAmount))}
             </p>
             {order.paymentMode && (
               <span
-                className={`inline-block mt-1 px-2 py-1 text-xs font-medium rounded ${getPaymentModeColor(
+                className={`inline-flex mt-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded shadow-sm ${getPaymentModeColor(
                   order.paymentMode
                 )}`}
               >
@@ -100,15 +110,15 @@ export default function OrderCard({
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-3 w-full sm:w-auto justify-end">
           {/* Approve button for pending QR orders */}
           {onApprove && order.status === 'PENDING' && (
             <button
               onClick={() => onApprove(order.id)}
               disabled={isUpdating}
-              className="px-6 py-3 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-green-500/20 transition-all hover:-translate-y-0.5"
             >
-              {isUpdating ? 'Approving...' : '✓ Approve'}
+              {isUpdating ? 'Approving...' : '✓ Approve Order'}
             </button>
           )}
 
@@ -117,7 +127,7 @@ export default function OrderCard({
             <button
               onClick={() => onUpdateStatus(order.id, nextStatus)}
               disabled={isUpdating}
-              className="px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-blue-500/20 transition-all hover:-translate-y-0.5"
             >
               {isUpdating ? 'Updating...' : `Mark as ${nextStatus}`}
             </button>
