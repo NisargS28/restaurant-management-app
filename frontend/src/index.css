@@ -277,3 +277,37 @@ a, .glass, .btn, button, input, select, textarea, img {
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out;
 }
+
+/* ================= Premium Background Shadows & Floating Food ================= */
+
+@keyframes floatFood {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.animated-food {
+  animation: floatFood 6s ease-in-out infinite;
+}
+
+/* Add drop shadow to the food images so they pop out */
+.animated-food-shadow {
+  filter: drop-shadow(0 20px 20px rgba(0,0,0,0.4));
+}
+.dark .animated-food-shadow {
+  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8));
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1) translate(0px, 0px); opacity: 0.5; }
+  33% { transform: scale(1.05) translate(20px, -20px); opacity: 0.6; }
+  66% { transform: scale(0.95) translate(-20px, 20px); opacity: 0.4; }
+}
+
+.animate-bg-glow {
+  animation: pulseGlow 15s infinite alternate ease-in-out;
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.2), 0 20px 100px rgba(0,0,0,0.1);
+}
+.dark .animate-bg-glow {
+  box-shadow: inset 0 0 150px rgba(0,0,0,0.8), 0 30px 150px rgba(0,0,0,0.5);
+}

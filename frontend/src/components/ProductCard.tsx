@@ -33,11 +33,11 @@ export default function ProductCard({
       onClick={() => onSelect && isActive && onSelect(product)}
     >
       {/* Product Image */}
-      <div className="relative h-32 w-full overflow-hidden bg-gray-100 dark:bg-slate-700/50">
+      <div className="relative h-32 w-full overflow-hidden bg-gray-100 dark:bg-slate-700/50 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 transition-colors duration-500">
         <img 
           src={imageUrl} 
           alt={product.name} 
-          className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
+          className="object-cover w-full h-full animated-food animated-food-shadow hover:scale-105 transition-transform duration-500"
         />
         {/* Dark mode image overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/40 pointer-events-none"></div>

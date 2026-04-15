@@ -314,8 +314,8 @@ export default function CustomerMenuPage() {
                 className="glass rounded-3xl overflow-hidden flex flex-col border border-white/60 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow group"
               >
                 {/* Product Image */}
-                <div className="relative h-36 w-full overflow-hidden bg-gray-100 dark:bg-slate-800/50">
-                  <img src={imgUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="relative h-36 w-full overflow-hidden bg-gray-100 dark:bg-slate-800/50 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 transition-colors duration-700">
+                  <img src={imgUrl} alt={product.name} className="w-full h-full object-cover animated-food animated-food-shadow transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent dark:from-black/40 pointer-events-none"></div>
                   <div className="absolute top-2 right-2 z-10 transition-transform hover:scale-110">
                     {qty === 0 && (

@@ -132,12 +132,12 @@ export default function Layout({ children, role, title }: LayoutProps) {
       
       {/* Background decoration */}
       <div className="fixed top-0 -z-10 h-full w-full bg-[var(--bg)]">
-        <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full opacity-50 blur-[100px]"
-          style={{ background: 'var(--bg-glow-1)' }}></div>
-        <div className="absolute top-0 right-auto left-0 h-[500px] w-[500px] translate-x-[10%] translate-y-[10%] rounded-full opacity-50 blur-[100px]"
-          style={{ background: 'var(--bg-glow-2)' }}></div>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[400px] w-[600px] rounded-full opacity-30 blur-[120px]"
-          style={{ background: 'var(--bg-glow-3)' }}></div>
+        <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full opacity-50 blur-[100px] animate-bg-glow"
+          style={{ background: 'var(--bg-glow-1)', animationDelay: '0s' }}></div>
+        <div className="absolute top-0 right-auto left-0 h-[500px] w-[500px] translate-x-[10%] translate-y-[10%] rounded-full opacity-50 blur-[100px] animate-bg-glow"
+          style={{ background: 'var(--bg-glow-2)', animationDelay: '5s' }}></div>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[400px] w-[600px] rounded-full opacity-30 blur-[120px] animate-bg-glow"
+          style={{ background: 'var(--bg-glow-3)', animationDelay: '10s' }}></div>
       </div>
     </div>
   );
