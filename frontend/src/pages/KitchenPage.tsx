@@ -20,34 +20,28 @@ export default function KitchenPage() {
   const [toast, setToast] = useState<ToastType>(null);
   const isFetchingRef = useRef(false);
 
-  // Show toast notification
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
   };
 
-  // Fetch orders — preserves existing orders on failure so kitchen stays usable
   const fetchOrders = useCallback(async () => {
-    // Prevent concurrent fetches
     if (isFetchingRef.current) return;
     isFetchingRef.current = true;
 
     try {
-      // Uses ?kitchen=true — backend returns only APPROVED, PREPARING, READY (if backend is updated)
       const response = await api.getKitchenOrders();
       if (response.success && response.data) {
-        // Fallback filter in case production backend is not updated yet and ignores ?kitchen=true
         const kitchenOrders = response.data.filter(
           (order: OrderWithItems) =>
             order.status === 'APPROVED' ||
             order.status === 'PREPARING' ||
             order.status === 'READY' ||
-            (order.status === 'PENDING' && order.source === 'CASHIER') // Handle legacy/un-updated backend stuck orders
+            (order.status === 'PENDING' && order.source === 'CASHIER')
         );
         setOrders(kitchenOrders);
         setFetchError(null);
         setLastUpdated(new Date());
       } else {
-        // On failure — keep existing orders visible, just show error banner
         setFetchError(response.error || 'Failed to load orders. Retrying…');
       }
     } finally {
@@ -56,17 +50,15 @@ export default function KitchenPage() {
     }
   }, []);
 
-  // Initial fetch and auto-refresh
   useEffect(() => {
     fetchOrders();
 
     if (autoRefresh) {
-      const interval = setInterval(fetchOrders, 5000); // Refresh every 5 seconds
+      const interval = setInterval(fetchOrders, 5000);
       return () => clearInterval(interval);
     }
   }, [autoRefresh, fetchOrders]);
 
-  // Update order status
   const handleUpdateStatus = async (orderId: number, status: string) => {
     setUpdatingOrderId(orderId);
 
@@ -85,7 +77,6 @@ export default function KitchenPage() {
   const filteredOrders =
     filter === 'all' ? orders : orders.filter((order) => order.status === filter);
 
-  // Format last-updated time
   const formatTime = (date: Date) =>
     date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -101,10 +92,10 @@ export default function KitchenPage() {
       )}
 
       <div>
-        {/* Error Banner — shown when fetch fails but orders may still be visible */}
+        {/* Error Banner */}
         {fetchError && !isLoading && (
-          <div className="mb-4 flex items-center justify-between bg-red-50 border border-red-300 rounded-lg px-4 py-3">
-            <div className="flex items-center gap-2 text-red-700">
+          <div className="mb-4 flex items-center justify-between bg-red-50 dark:bg-red-500/10 border border-red-300 dark:border-red-500/20 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
               <span className="text-lg">⚠️</span>
               <span className="font-medium text-sm">
                 Connection issue: {fetchError}
@@ -112,7 +103,7 @@ export default function KitchenPage() {
             </div>
             <button
               onClick={fetchOrders}
-              className="text-sm font-semibold text-red-700 hover:text-red-900 underline"
+              className="text-sm font-semibold text-red-700 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 underline"
             >
               Retry now
             </button>
@@ -126,8 +117,8 @@ export default function KitchenPage() {
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-blue-600 dark:bg-indigo-600 text-white'
+                  : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/15'
               }`}
             >
               All ({orders.length})
@@ -137,7 +128,7 @@ export default function KitchenPage() {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'APPROVED'
                   ? 'bg-orange-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/15'
               }`}
             >
               New ({orders.filter((o) => o.status === 'APPROVED').length})
@@ -146,8 +137,8 @@ export default function KitchenPage() {
               onClick={() => setFilter('PREPARING')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'PREPARING'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-blue-600 dark:bg-indigo-600 text-white'
+                  : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/15'
               }`}
             >
               Preparing ({orders.filter((o) => o.status === 'PREPARING').length})
@@ -157,7 +148,7 @@ export default function KitchenPage() {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'READY'
                   ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/15'
               }`}
             >
               Ready ({orders.filter((o) => o.status === 'READY').length})
@@ -165,9 +156,8 @@ export default function KitchenPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Last updated timestamp */}
             {lastUpdated && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 Updated {formatTime(lastUpdated)}
               </span>
             )}
@@ -178,11 +168,11 @@ export default function KitchenPage() {
                 onChange={(e) => setAutoRefresh(e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className="text-sm text-gray-700">Auto-refresh (5s)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">Auto-refresh (5s)</span>
             </label>
             <button
               onClick={fetchOrders}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+              className="px-4 py-2 bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-white/15 font-medium transition-colors"
             >
               🔄 Refresh
             </button>
@@ -193,7 +183,7 @@ export default function KitchenPage() {
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner size="lg" />
-            <span className="ml-4 text-xl text-gray-600">Loading orders…</span>
+            <span className="ml-4 text-xl text-gray-600 dark:text-gray-400">Loading orders…</span>
           </div>
         ) : filteredOrders.length === 0 ? (
           <EmptyState

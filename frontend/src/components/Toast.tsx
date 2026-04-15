@@ -22,7 +22,7 @@ export default function Toast({ message, type = 'info', duration = 3000, onClose
   const bgColor = {
     success: 'bg-green-600',
     error: 'bg-red-600',
-    info: 'bg-blue-600',
+    info: 'bg-blue-600 dark:bg-indigo-600',
   }[type];
 
   const icon = {
@@ -34,7 +34,7 @@ export default function Toast({ message, type = 'info', duration = 3000, onClose
   return (
     <div
       className={`
-        fixed top-4 right-4 z-50 flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg text-white
+        fixed top-4 right-4 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-lg dark:shadow-2xl text-white backdrop-blur-md
         ${bgColor}
         transition-all duration-300
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
@@ -47,7 +47,7 @@ export default function Toast({ message, type = 'info', duration = 3000, onClose
           setIsVisible(false);
           setTimeout(onClose, 300);
         }}
-        className="ml-4 text-xl font-bold hover:opacity-75"
+        className="ml-4 text-xl font-bold hover:opacity-75 transition-opacity"
       >
         ×
       </button>

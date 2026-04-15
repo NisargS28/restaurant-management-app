@@ -1,51 +1,279 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+/* ================= Fonts ================= */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ================= Tailwind v4: class-based dark mode ================= */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ================= Light Theme (default) ================= */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --bg: #faf9f7;
+  --bg-secondary: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.35);
+  --accent: #10b981;
+
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.5);
+
+  --card-bg: #ffffff;
+  --card-border: rgba(226, 232, 240, 0.8);
+
+  --input-bg: #faf9f7;
+  --input-border: #e5e7eb;
+
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.1);
+
+  --divider: rgba(226, 232, 240, 0.6);
+
+  /* Unique warm & organic light background glows */
+  --bg-glow-1: rgba(244, 163, 96, 0.09);   /* warm amber */
+  --bg-glow-2: rgba(110, 186, 140, 0.08);   /* sage green */
+  --bg-glow-3: rgba(193, 154, 210, 0.07);   /* soft lavender */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+/* ================= Dark Theme — warm charcoal + teal/amber ================= */
+.dark {
+  --bg: #121212;
+  --bg-secondary: #1e1e1e;
+  --text: #e8e6e3;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  --primary: #a78bfa;
+  --primary-glow: rgba(167, 139, 250, 0.25);
+  --accent: #34d399;
+
+  --glass-bg: rgba(30, 30, 30, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+
+  --card-bg: rgba(30, 30, 30, 0.65);
+  --card-border: rgba(255, 255, 255, 0.05);
+
+  --input-bg: rgba(30, 30, 30, 0.8);
+  --input-border: rgba(255, 255, 255, 0.08);
+
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+  --divider: rgba(255, 255, 255, 0.05);
+
+  /* Unique dark background glows — teal, amber warmth, soft rose */
+  --bg-glow-1: rgba(45, 212, 191, 0.07);    /* teal */
+  --bg-glow-2: rgba(251, 191, 36, 0.05);    /* warm amber */
+  --bg-glow-3: rgba(244, 114, 182, 0.06);   /* soft rose */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ================= Base ================= */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+  padding: 0;
+
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
+
+  line-height: 1.6;
+  letter-spacing: -0.015em;
+
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s ease;
 }
 
-/* Base custom classes for glassmorphism */
+/* ================= Glassmorphism (Premium) ================= */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-dark {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Glow edge effect */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
-/* Hide scrollbar for category lists but keep functionality */
+.dark .glass::before {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.15),
+    rgba(45, 212, 191, 0.05),
+    transparent
+  );
+}
+
+/* Hover = premium feel */
+.glass:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-strong);
+}
+
+/* ================= Buttons ================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 18px;
+  border-radius: 12px;
+
+  font-weight: 500;
+  letter-spacing: -0.01em;
+
+  background: linear-gradient(135deg, var(--primary), #4f46e5);
+  color: white;
+
+  box-shadow: 0 6px 20px var(--primary-glow);
+
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--primary-glow);
+}
+
+/* ================= Scrollbar (Modern Minimal) ================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.15);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(167, 139, 250, 0.3);
+}
+
+/* Hide when needed */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ================= Selection ================= */
+::selection {
+  background: rgba(167, 139, 250, 0.2);
+}
+
+/* ================= Links ================= */
+a {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+
+  width: 0%;
+  height: 1px;
+
+  background: var(--primary);
+  transition: width 0.25s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* ================= Theme Toggle Animation ================= */
+.theme-toggle-icon {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
+}
+
+.theme-toggle-icon:hover {
+  transform: rotate(30deg) scale(1.1);
+}
+
+/* ================= Smooth theme transitions ================= */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset for elements that need their own transition rules */
+a, .glass, .btn, button, input, select, textarea, img {
+  transition-property: all;
+}
+
+/* ================= Micro-animations ================= */
+@keyframes cartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.cart-pop {
+  animation: cartPop 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
 }

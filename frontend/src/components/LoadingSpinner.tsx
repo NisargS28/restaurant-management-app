@@ -8,7 +8,7 @@ export default function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | '
   return (
     <div className="flex justify-center items-center">
       <div 
-        className={`inline-block animate-spin rounded-full border-blue-500 border-l-transparent border-r-transparent ${sizeClasses[size]} drop-shadow-md`} 
+        className={`inline-block animate-spin rounded-full border-blue-500 dark:border-indigo-400 border-l-transparent border-r-transparent ${sizeClasses[size]} drop-shadow-md`} 
         style={{ animationDuration: '0.8s' }}
       />
     </div>
